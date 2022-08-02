@@ -12,9 +12,11 @@ export const NewExpenseForm = () => {
 
   const createExpense = useCallback(
     (expense: z.infer<typeof Expense>) => {
-      expenseCreation.mutate(expense);
-
-      trpcContext.invalidateQueries(['expense.allExpenses']);
+      expenseCreation.mutate(expense, {
+        onSuccess: () => {
+          trpcContext.invalidateQueries(['expense.allExpenses']);
+        },
+      });
     },
     [trpcContext, expenseCreation]
   );
