@@ -1,6 +1,6 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import { trpc } from "../utils/trpc";
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import { trpc } from '../utils/trpc';
 
 type TechnologyCardProps = {
   name: string;
@@ -9,7 +9,18 @@ type TechnologyCardProps = {
 };
 
 const Home: NextPage = () => {
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
+  const expenses = trpc.useQuery(['expense.allExpenses']);
+  const expenseCreation = trpc.useMutation(['expense.createExpense']);
+
+  const createExpense = () => {
+    expenseCreation.mutate({
+      name: 'Test expense',
+      amount: 100,
+      description: 'No description',
+    });
+
+    expenses.refetch();
+  };
 
   return (
     <>
@@ -46,19 +57,23 @@ const Home: NextPage = () => {
             documentation="https://trpc.io/"
           />
         </div>
-        <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
+        <button
+          className="mt-3 text-sm underline text-violet-500 decoration-dotted underline-offset-2"
+          onClick={createExpense}
+        >
+          Create expense
+        </button>
+        <div className="flex flex-col gap-2">
+          {expenses.data?.map((expense) => (
+            <div key={expense.id}>{expense.name}</div>
+          ))}
         </div>
       </main>
     </>
   );
 };
 
-const TechnologyCard = ({
-  name,
-  description,
-  documentation,
-}: TechnologyCardProps) => {
+const TechnologyCard = ({ name, description, documentation }: TechnologyCardProps) => {
   return (
     <section className="flex flex-col justify-center p-6 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
       <h2 className="text-lg text-gray-700">{name}</h2>
