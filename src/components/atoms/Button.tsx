@@ -40,7 +40,14 @@ export const Button: FC<Props> = ({
         'opacity-50': loading,
         'opacity-100': !loading,
       },
-      'transition-all duration-200 ease-in-out px-3 py-2 rounded'
+      {
+        'hover:bg-gray-400 hover:text-gray-900': variant === 'primary',
+        'hover:bg-gray-500 hover:text-white': variant === 'secondary',
+        'hover:bg-gray-600 hover:text-white': variant === 'tertiary',
+        'hover:bg-gray-700 hover:text-white': variant === 'warning',
+        'hover:bg-red-700 hover:text-white': variant === 'danger',
+      },
+      'transition-all duration-200 ease-in-out px-3 py-2 rounded border'
     )}
     type={type}
     onClick={onClick}

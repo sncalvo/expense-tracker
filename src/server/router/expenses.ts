@@ -1,6 +1,7 @@
 import { createRouter } from './context';
 
 import { Expense } from '@schemas/Expense';
+import { z } from 'zod';
 
 export const expensesRouter = createRouter()
   .query('allExpenses', {
@@ -13,6 +14,14 @@ export const expensesRouter = createRouter()
     async resolve({ ctx, input }) {
       return await ctx.prisma.expense.create({
         data: input,
+      });
+    },
+  })
+  .mutation('deleteExpense', {
+    input: z.object({ id: z.string() }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.expense.delete({
+        where: { id: input.id },
       });
     },
   });

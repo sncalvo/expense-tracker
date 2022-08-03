@@ -23,12 +23,20 @@ export const NewExpenseForm = () => {
 
   return (
     <Form onSubmit={createExpense} schema={Expense}>
-      <Input name="name" label="Name" placeholder="Name" />
-      <Input name="amount" label="Amount" placeholder="Amount" />
-      <Input name="description" label="Description" placeholder="Description" />
-      <Button type="submit" loading={expenseCreation.isLoading}>
-        Submit
-      </Button>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <Input name="name" label="Name" placeholder="Name" />
+        <Input name="amount" label="Amount" placeholder="Amount" />
+
+        <div className="col-span-2 md:col-span-3">
+          <Input name="description" label="Description" placeholder="Description" type="textarea" />
+        </div>
+
+        <div className="flex">
+          <Button type="submit" loading={expenseCreation.isLoading}>
+            Submit
+          </Button>
+        </div>
+      </div>
     </Form>
   );
 };
