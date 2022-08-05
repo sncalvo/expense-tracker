@@ -38,8 +38,20 @@ model Expense {
     name String
     amount Float
     description String
+    date DateTime @default(now())
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
+
+    categories Category[]
+}
+
+model Category {
+    id String @id @default(cuid())
+    name String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+
+    expenses Expense[]
 }
 
 model Session {

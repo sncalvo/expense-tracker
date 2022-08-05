@@ -1,7 +1,8 @@
 import { Button, Form, Input } from '@components/atoms';
+import { CategorySelectionInput } from '@components/molecules';
 import { Expense } from '@schemas/Expense';
 import { trpc } from '@utils/trpc';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { z } from 'zod';
 
@@ -12,6 +13,7 @@ export const NewExpenseForm = () => {
 
   const createExpense = useCallback(
     (expense: z.infer<typeof Expense>) => {
+      console.log(expense);
       expenseCreation.mutate(expense, {
         onSuccess: () => {
           trpcContext.invalidateQueries(['expense.allExpenses']);
@@ -21,8 +23,18 @@ export const NewExpenseForm = () => {
     [trpcContext, expenseCreation]
   );
 
+  const defaultValues = useMemo(
+    () => ({
+      name: '',
+      description: '',
+      amount: 0,
+      categories: [],
+    }),
+    []
+  );
+
   return (
-    <Form onSubmit={createExpense} schema={Expense}>
+    <Form onSubmit={createExpense} schema={Expense} defaultValues={defaultValues}>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
         <Input name="name" label="Name" placeholder="Name" />
         <Input name="amount" label="Amount" placeholder="Amount" />
@@ -31,7 +43,11 @@ export const NewExpenseForm = () => {
           <Input name="description" label="Description" placeholder="Description" type="textarea" />
         </div>
 
-        <div className="flex">
+        <div className="col-span-2">
+          <CategorySelectionInput />
+        </div>
+
+        <div className="col-span-2 md:grid-cols-3 flex">
           <Button type="submit" loading={expenseCreation.isLoading}>
             Submit
           </Button>

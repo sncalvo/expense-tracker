@@ -6,14 +6,30 @@ import { z } from 'zod';
 export const expensesRouter = createRouter()
   .query('allExpenses', {
     async resolve({ ctx }) {
-      return await ctx.prisma.expense.findMany();
+      return await ctx.prisma.expense.findMany({
+        include: {
+          categories: true,
+        },
+      });
     },
   })
   .mutation('createExpense', {
     input: Expense,
     async resolve({ ctx, input }) {
+      const { name, amount, description, categories } = input;
+
       return await ctx.prisma.expense.create({
-        data: input,
+        data: {
+          name,
+          amount,
+          description,
+          categories: {
+            connectOrCreate: categories.map(({ id, name }) => ({
+              where: { id },
+              create: { name },
+            })),
+          },
+        },
       });
     },
   })

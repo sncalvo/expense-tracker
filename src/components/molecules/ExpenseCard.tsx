@@ -1,11 +1,11 @@
 import { Button } from '@components/atoms';
-import { Expense } from '@schemas/Expense';
+import { Category, Expense } from '@prisma/client';
+
 import { trpc } from '@utils/trpc';
 import { useCallback } from 'react';
-import { z } from 'zod';
 
 interface Props {
-  expense: z.infer<typeof Expense> & { id: string };
+  expense: Expense & { categories: Category[] };
 }
 
 export const ExpenseCard: React.FC<Props> = ({ expense }) => {
@@ -24,18 +24,27 @@ export const ExpenseCard: React.FC<Props> = ({ expense }) => {
   }, [deleteMutation, expense.id, trpcContext]);
 
   return (
-    <li className="grid grid-cols-4 border p-3">
-      <div className="col-span-2">
-        <h3 className="text-md">{expense.name}</h3>
-        <p className="text-sm">{expense.description}</p>
+    <li className="flex flex-col border p-3 gap-3">
+      <div className="grid grid-cols-4">
+        <div className="col-span-2">
+          <h3 className="text-md">{expense.name}</h3>
+          <p className="text-sm">{expense.description}</p>
+        </div>
+
+        <h3 className="col-span-1 text-md">{expense.amount}</h3>
+
+        <div className="flex col-span-1 items-stretch justify-end">
+          <Button type="button" outline variant="danger" onClick={deleteExpense}>
+            Delete
+          </Button>
+        </div>
       </div>
-
-      <h3 className="col-span-1 text-md">{expense.amount}</h3>
-
-      <div className="flex col-span-1 items-stretch justify-end">
-        <Button type="button" outline variant="danger" onClick={deleteExpense}>
-          Delete
-        </Button>
+      <div>
+        {expense.categories.map((category) => (
+          <span key={category.id} className="inline-block bg-gray-200 px-2 py-1 mr-2">
+            {category.name}
+          </span>
+        ))}
       </div>
     </li>
   );

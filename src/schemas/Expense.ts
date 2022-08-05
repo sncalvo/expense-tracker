@@ -1,7 +1,15 @@
-import zod from 'zod';
+import { z } from 'zod';
 
-export const Expense = zod.object({
-  name: zod.string(),
-  amount: zod.preprocess((amount) => parseInt(amount as string, 10), zod.number().positive()),
-  description: zod.string(),
+const Categories = z.array(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+  })
+);
+
+export const Expense = z.object({
+  name: z.string(),
+  amount: z.preprocess((amount) => parseInt(amount as string, 10), z.number().positive()),
+  description: z.string(),
+  categories: Categories,
 });
