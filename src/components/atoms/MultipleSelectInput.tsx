@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import { useState, useCallback, useEffect } from 'react';
 import { Button } from './Button';
 
+import { AiFillPlusCircle, AiFillTags, AiFillCloseCircle } from 'react-icons/ai';
+
 interface Value {
   id: string;
   name: string;
@@ -55,61 +57,74 @@ export const MultipleSelectInput: React.FC<Props> = ({
 
   return (
     <div className="flex flex-col gap-1">
-      {values.map(({ id, name }) => (
-        <div key={id} className="flex gap-1">
-          <span>{name}</span>
-          <Button type="button" variant="danger" onClick={() => onRemove(id)}>
-            Remove
-          </Button>
-        </div>
-      ))}
+      <div className="flex gap-2">
+        {values.map(({ id, name }) => (
+          <div key={id} className="flex gap-1 items-center border p-1 rounded">
+            <span>{name}</span>
+            <Button
+              type="button"
+              variant="danger"
+              size="small"
+              onClick={() => onRemove(id)}
+              outline
+              icon
+            >
+              <AiFillCloseCircle />
+            </Button>
+          </div>
+        ))}
+        <Button
+          variant="primary"
+          type="button"
+          size="small"
+          onClick={() => setOpenCategories(!openCategories)}
+          icon
+        >
+          <AiFillTags size={24} />
+        </Button>
+      </div>
 
       <div>
-        <Button variant="primary" type="button" onClick={() => setOpenCategories(!openCategories)}>
-          Toggle Categories
-        </Button>
+        <div
+          className={clsx('absolute transition-all', {
+            '-translate-x-full opacity-0 cursor-not-allowed pointer-events-none': !openCategories,
+            'translate-x-0 opacity-100': openCategories,
+          })}
+        >
+          <div className="flex gap-1">
+            <input
+              type="text"
+              className="w-full border rounded p-2"
+              value={value}
+              onChange={onValueChange}
+            />
 
-        <div>
-          <div
-            className={clsx('absolute transition-all', {
-              '-translate-x-full opacity-0 cursor-not-allowed pointer-events-none': !openCategories,
-              'translate-x-0 opacity-100': openCategories,
-            })}
-          >
-            <div className="flex gap-1">
-              <input
-                type="text"
-                className="w-full border rounded p-2"
-                value={value}
-                onChange={onValueChange}
-              />
-              <Button type="button" variant="primary" onClick={onCreatePress}>
-                Create/Add
-              </Button>
-            </div>
-
-            {suggestions.length !== 0 && value !== '' && (
-              <div className="flex gap-1">
-                {suggestions
-                  .filter(
-                    ({ id }) => values.find(({ id: categoryId }) => id === categoryId) === undefined
-                  )
-                  .map(({ id, name }) => (
-                    <Button
-                      key={id}
-                      variant="secondary"
-                      outline
-                      type="button"
-                      onClick={() => {
-                        onUseSuggestion({ name, id });
-                      }}
-                    >
-                      <span>{name}</span>
-                    </Button>
-                  ))}
-              </div>
-            )}
+            <Button type="button" variant="secondary" onClick={onCreatePress} size="small" icon>
+              <AiFillPlusCircle size={24} />
+            </Button>
           </div>
+
+          {suggestions.length !== 0 && value !== '' && (
+            <div className="flex gap-1 bg-white rounded p-1">
+              {suggestions
+                .filter(
+                  ({ id }) => values.find(({ id: categoryId }) => id === categoryId) === undefined
+                )
+                .map(({ id, name }) => (
+                  <Button
+                    key={id}
+                    variant="secondary"
+                    outline
+                    type="button"
+                    onClick={() => {
+                      onUseSuggestion({ name, id });
+                    }}
+                  >
+                    <span>{name}</span>
+                  </Button>
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

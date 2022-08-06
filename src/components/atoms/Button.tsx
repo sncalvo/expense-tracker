@@ -5,6 +5,8 @@ import clsx from 'clsx';
 interface Props {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'tertiary' | 'warning' | 'danger';
+  size?: 'small' | 'regular';
+  icon?: boolean;
   outline?: boolean;
   type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
@@ -15,6 +17,8 @@ interface Props {
 export const Button: FC<Props> = ({
   children,
   variant = 'primary',
+  size = 'regular',
+  icon = false,
   outline = false,
   type = 'button',
   onClick,
@@ -47,7 +51,14 @@ export const Button: FC<Props> = ({
         'hover:bg-gray-700 hover:text-white': variant === 'warning',
         'hover:bg-red-700 hover:text-white': variant === 'danger',
       },
-      'transition-all duration-200 ease-in-out px-3 py-2 rounded border'
+      {
+        'px-3 py-2': size === 'regular',
+        'px-1 py-1': size === 'small',
+      },
+      {
+        'flex items-center justify-center border-0': icon,
+      },
+      'transition-all duration-200 ease-in-out rounded border'
     )}
     type={type}
     onClick={onClick}
