@@ -1,6 +1,8 @@
-import { trpc } from '@utils/trpc';
 import { useCallback, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+
+import { MultipleSelectInput } from '@components/atoms';
+import { trpc } from '@utils/trpc';
 
 type FormValues = {
   categories: { id: string; name: string }[];
@@ -8,35 +10,37 @@ type FormValues = {
 
 export const CategorySelectionInput: React.FC = () => {
   const name = 'categories';
-  const [value, setValue] = useState('');
+  const [suggestionValue, setSuggestionValue] = useState('');
 
-  const categories = trpc.useQuery(['categories.allCategories', value]);
+  const categories = trpc.useQuery(['categories.allCategories', suggestionValue]);
   const createCategory = trpc.useMutation(['categories.createCategory']);
-
-  const { register } = useFormContext();
 
   const { fields, append, remove } = useFieldArray<FormValues, 'categories', 'key'>({
     name,
     keyName: 'key',
   });
 
-  const onCreate = useCallback(() => {
-    createCategory.mutate(
-      { name: value },
-      {
-        onSuccess(data) {
-          append({ name: data.name, id: data.id });
-          setValue('');
-        },
-      }
-    );
-  }, [append, createCategory, value]);
+  const { register } = useFormContext();
 
-  const onValueChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setValue(e.target.value);
+  const onCreate = useCallback(
+    ({ name }: { id?: string; name: string }) => {
+      createCategory.mutate(
+        { name },
+        {
+          onSuccess(data) {
+            append({ name: data.name, id: data.id });
+          },
+        }
+      );
     },
-    [setValue]
+    [append, createCategory]
+  );
+
+  const onRemove = useCallback(
+    (id: string) => {
+      remove(fields.findIndex(({ id: fieldId }) => fieldId === id));
+    },
+    [fields, remove]
   );
 
   return (
@@ -45,55 +49,19 @@ export const CategorySelectionInput: React.FC = () => {
         Categories
       </label>
 
-      <div className="flex flex-col gap-1">
+      <div className="invisible">
         {fields.map((field, index) => (
-          <div key={field.key} className="flex gap-1">
-            <input
-              {...register(`${name}.${index}.name`)}
-              readOnly
-              className="border rounded p-2"
-              type="text"
-              placeholder="Add a suggestion"
-            />
-            <input {...register(`${name}.${index}.id`)} hidden readOnly />
-            <button type="button" className="bg-gray-200 px-2 py-1" onClick={() => remove(index)}>
-              Remove
-            </button>
-          </div>
+          <input key={field.id} {...register(`${name}.${index}.id`)} hidden />
         ))}
-
-        <div className="flex gap-1">
-          <input
-            type="text"
-            className="w-full border rounded p-2"
-            value={value}
-            onChange={onValueChange}
-          />
-          <button type="button" className="bg-gray-200 px-2 py-1 flex-none" onClick={onCreate}>
-            Create/Add
-          </button>
-        </div>
-
-        {categories.data && categories.data.length !== 0 && value !== '' && (
-          <div className="flex flex-col gap-1">
-            {categories.data
-              .filter(
-                ({ id }) => fields.find(({ id: categoryId }) => id === categoryId) === undefined
-              )
-              .map((suggestion) => (
-                <button
-                  type="button"
-                  key={suggestion.id}
-                  onClick={() => {
-                    append({ name: suggestion.name, id: suggestion.id });
-                  }}
-                >
-                  <span>{suggestion.name}</span>
-                </button>
-              ))}
-          </div>
-        )}
       </div>
+
+      <MultipleSelectInput
+        onAdd={onCreate}
+        values={fields}
+        suggestions={categories.data ?? []}
+        onRemove={onRemove}
+        setSuggestionValue={setSuggestionValue}
+      />
     </div>
   );
 };

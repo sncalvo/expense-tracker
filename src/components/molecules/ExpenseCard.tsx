@@ -1,8 +1,9 @@
-import { Button } from '@components/atoms';
+import { useCallback, useState } from 'react';
 import { Category, Expense } from '@prisma/client';
 
+import { Button, MultipleSelectInput } from '@components/atoms';
+
 import { trpc } from '@utils/trpc';
-import { useCallback } from 'react';
 
 interface Props {
   expense: Expense & { categories: Category[] };
@@ -10,6 +11,7 @@ interface Props {
 
 export const ExpenseCard: React.FC<Props> = ({ expense }) => {
   const deleteMutation = trpc.useMutation(['expense.deleteExpense']);
+  const updateCategoriesMutation = trpc.useMutation(['expense.udpateCategories']);
   const trpcContext = trpc.useContext();
 
   const deleteExpense = useCallback(() => {
@@ -22,6 +24,65 @@ export const ExpenseCard: React.FC<Props> = ({ expense }) => {
       }
     );
   }, [deleteMutation, expense.id, trpcContext]);
+
+  const [suggestionValue, setSuggestionValue] = useState('');
+
+  const categories = trpc.useQuery(['categories.allCategories', suggestionValue]);
+  const createCategory = trpc.useMutation(['categories.createCategory']);
+
+  const onCreate = useCallback(
+    ({ name }: { id?: string; name: string }) => {
+      createCategory.mutate(
+        { name },
+        {
+          onSuccess(data) {
+            updateCategoriesMutation.mutate(
+              {
+                id: expense.id,
+                categories: {
+                  connectOrCreate: [
+                    {
+                      name: data.name,
+                      id: data.id,
+                    },
+                  ],
+                },
+              },
+              {
+                onSuccess: () => {
+                  trpcContext.invalidateQueries(['expense.allExpenses']);
+                },
+              }
+            );
+          },
+        }
+      );
+    },
+    [createCategory, expense.id, trpcContext, updateCategoriesMutation]
+  );
+
+  const onRemove = useCallback(
+    (id: string) => {
+      updateCategoriesMutation.mutate(
+        {
+          id: expense.id,
+          categories: {
+            disconnect: [
+              {
+                id,
+              },
+            ],
+          },
+        },
+        {
+          onSuccess: () => {
+            trpcContext.invalidateQueries(['expense.allExpenses']);
+          },
+        }
+      );
+    },
+    [expense.id, trpcContext, updateCategoriesMutation]
+  );
 
   return (
     <li className="flex flex-col border p-3 gap-3">
@@ -39,13 +100,14 @@ export const ExpenseCard: React.FC<Props> = ({ expense }) => {
           </Button>
         </div>
       </div>
-      <div>
-        {expense.categories.map((category) => (
-          <span key={category.id} className="inline-block bg-gray-200 px-2 py-1 mr-2">
-            {category.name}
-          </span>
-        ))}
-      </div>
+
+      <MultipleSelectInput
+        onAdd={onCreate}
+        values={expense.categories}
+        suggestions={categories.data ?? []}
+        onRemove={onRemove}
+        setSuggestionValue={setSuggestionValue}
+      />
     </li>
   );
 };

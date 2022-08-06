@@ -2,7 +2,8 @@ import { Button, Form, Input } from '@components/atoms';
 import { CategorySelectionInput } from '@components/molecules';
 import { Expense } from '@schemas/Expense';
 import { trpc } from '@utils/trpc';
-import { useCallback, useMemo } from 'react';
+import clsx from 'clsx';
+import { useCallback, useMemo, useState } from 'react';
 
 import { z } from 'zod';
 
@@ -32,6 +33,8 @@ export const NewExpenseForm = () => {
     }),
     []
   );
+
+  const [openCategories, setOpenCategories] = useState(false);
 
   return (
     <Form onSubmit={createExpense} schema={Expense} defaultValues={defaultValues}>

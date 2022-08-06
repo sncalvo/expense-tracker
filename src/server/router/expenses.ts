@@ -1,6 +1,6 @@
 import { createRouter } from './context';
 
-import { Expense } from '@schemas/Expense';
+import { Expense, UpdateCategoriesSchema } from '@schemas/Expense';
 import { z } from 'zod';
 
 export const expensesRouter = createRouter()
@@ -38,6 +38,25 @@ export const expensesRouter = createRouter()
     async resolve({ ctx, input }) {
       return await ctx.prisma.expense.delete({
         where: { id: input.id },
+      });
+    },
+  })
+  .mutation('udpateCategories', {
+    input: UpdateCategoriesSchema,
+    async resolve({ ctx, input }) {
+      const { id, categories } = input;
+
+      return await ctx.prisma.expense.update({
+        where: { id },
+        data: {
+          categories: {
+            connectOrCreate: categories.connectOrCreate?.map(({ id, name }) => ({
+              where: { id },
+              create: { name },
+            })),
+            disconnect: categories.disconnect,
+          },
+        },
       });
     },
   });
