@@ -19,9 +19,7 @@ export const Input = ({ name, label, placeholder, type = 'text' }: Props) => {
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-gray-700">
-        {label}
-      </label>
+      <label htmlFor={name}>{label}</label>
 
       {type === 'textarea' ? (
         <textarea
@@ -32,7 +30,7 @@ export const Input = ({ name, label, placeholder, type = 'text' }: Props) => {
               'border-red-600': errorMessage,
               'border-gray-300': !errorMessage,
             },
-            'border rounded p-2'
+            'border border-gray-600 rounded p-2 bg-slate-800 outline-none focus:border-white transition-all'
           )}
           placeholder={placeholder}
           aria-invalid={errorMessage ? 'true' : 'false'}
@@ -46,7 +44,7 @@ export const Input = ({ name, label, placeholder, type = 'text' }: Props) => {
               'border-red-600': errorMessage,
               'border-gray-300': !errorMessage,
             },
-            'border rounded p-2'
+            'border border-gray-600 rounded p-2 bg-slate-800 outline-none focus:border-white transition-all'
           )}
           type={type}
           placeholder={placeholder}

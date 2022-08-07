@@ -32,7 +32,7 @@ export const NavMenu: React.FC = () => {
           {
             '-translate-x-full lg:translate-x-0': !open,
           },
-          'fixed lg:static flex flex-col justify-start p-3 transition-all bg-white h-screen shadow'
+          'fixed lg:static flex flex-col justify-start p-3 transition-all bg-gray-700 h-screen shadow'
         )}
       >
         <div className="flex justify-end lg:hidden">
@@ -46,7 +46,7 @@ export const NavMenu: React.FC = () => {
               <Link href={href}>
                 <a
                   className={clsx(
-                    'text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-200',
+                    'text-white hover:text-gray-800 p-2 hover:bg-gray-200',
                     'text-xl',
                     'w-full transition-all rounded'
                   )}

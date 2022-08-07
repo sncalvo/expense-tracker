@@ -45,9 +45,7 @@ export const CategorySelectionInput: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-gray-700">
-        Categories
-      </label>
+      <label htmlFor={name}>Categories</label>
 
       <div className="invisible">
         {fields.map((field, index) => (

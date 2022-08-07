@@ -22,13 +22,13 @@ const Expenses: NextPage = () => {
         <NavMenu />
 
         <main className="p-8">
-          <h1 className="text-2xl leading-normal font-extrabold text-gray-700">Expense tracker</h1>
+          <h1 className="text-2xl leading-normal font-extrabold">Expense tracker</h1>
 
           <NewExpenseForm />
 
           <div className="md:w-1/2 my-2">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl leading-normal font-extrabold text-gray-700">Expenses</h2>
+              <h2 className="text-xl leading-normal font-extrabold">Expenses</h2>
               <h3>Total: {expenses.data?.length ?? 'loading...'}</h3>
             </div>
             <ul className="h-96 list-none overflow-auto flex flex-col gap-2">
