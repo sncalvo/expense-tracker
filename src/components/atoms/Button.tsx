@@ -59,7 +59,7 @@ export const Button: FC<Props> = ({
         'flex items-center justify-center border-0': icon,
         border: !icon,
       },
-      'transition-all duration-200 ease-in-out rounded font-medium'
+      'transition-all duration-200 ease-in-out rounded font-medium shadow'
     )}
     type={type}
     onClick={onClick}
