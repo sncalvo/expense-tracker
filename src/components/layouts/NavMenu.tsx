@@ -15,6 +15,10 @@ const links = [
     name: 'Expenses',
     href: '/expenses',
   },
+  {
+    name: 'Statistics',
+    href: '/statistics',
+  },
 ];
 
 export const NavMenu: React.FC = () => {
