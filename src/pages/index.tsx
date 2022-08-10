@@ -13,10 +13,8 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="p-8">
-        <Link href={'/expenses'}>
-          <a className="text-gray-600 hover:text-gray-800" href="/expenses">
-            Expenses
-          </a>
+        <Link href="/expenses">
+          <a className="text-gray-600 hover:text-gray-800">Expenses</a>
         </Link>
       </main>
     </>

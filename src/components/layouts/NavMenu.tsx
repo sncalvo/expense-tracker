@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { Button } from '@components/atoms';
 
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
+import { signIn } from 'next-auth/react';
 
 const links = [
   {
@@ -45,6 +46,11 @@ export const NavMenu: React.FC = () => {
           </Button>
         </div>
         <ul className="flex flex-col items-stretch">
+          <li>
+            <Button type="button" size="small" onClick={() => signIn()}>
+              Log in
+            </Button>
+          </li>
           {links.map(({ name, href }) => (
             <li key={name} className="flex">
               <Link href={href}>
