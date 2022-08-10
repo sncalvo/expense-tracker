@@ -94,7 +94,7 @@ export const MultipleSelectInput: React.FC<Props> = ({
           <div className="flex gap-1">
             <input
               type="text"
-              className="w-full border rounded p-2"
+              className="w-full border border-gray-600 rounded p-2 bg-slate-800 outline-none focus:border-white transition-all"
               value={value}
               onChange={onValueChange}
             />

@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { Button } from '@components/atoms';
 
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 const links = [
   {
@@ -24,6 +24,8 @@ const links = [
 
 export const NavMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
+
+  const { data } = useSession();
 
   return (
     <>
@@ -47,9 +49,15 @@ export const NavMenu: React.FC = () => {
         </div>
         <ul className="flex flex-col items-stretch">
           <li>
-            <Button type="button" size="small" onClick={() => signIn()}>
-              Log in
-            </Button>
+            {data?.user ? (
+              <Button type="button" size="small" onClick={() => signOut()}>
+                Log out
+              </Button>
+            ) : (
+              <Button type="button" size="small" onClick={() => signIn()}>
+                Log in
+              </Button>
+            )}
           </li>
           {links.map(({ name, href }) => (
             <li key={name} className="flex">

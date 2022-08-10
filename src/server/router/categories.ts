@@ -1,7 +1,8 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { createRouter } from './context';
+import { createProtectedRouter } from './protected-router';
 
-export const categoriesRouter = createRouter()
+export const categoriesRouter = createProtectedRouter()
   .query('allCategories', {
     input: z.string().optional(),
     async resolve({ ctx, input }) {
@@ -10,6 +11,7 @@ export const categoriesRouter = createRouter()
           name: {
             contains: input,
           },
+          OR: [{ userId: ctx.session.user.id }, { userId: null }],
         },
       });
     },
@@ -19,9 +21,14 @@ export const categoriesRouter = createRouter()
       name: z.string(),
     }),
     async resolve({ ctx, input }) {
+      if (!ctx.session.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN' });
+      }
+
       const otherCategroy = await ctx.prisma.category.findFirst({
         where: {
           name: input.name,
+          OR: [{ userId: ctx.session.user.id }, { userId: null }],
         },
       });
 
@@ -30,7 +37,7 @@ export const categoriesRouter = createRouter()
       }
 
       return await ctx.prisma.category.create({
-        data: input,
+        data: { ...input, userId: ctx.session.user.id },
       });
     },
   });
