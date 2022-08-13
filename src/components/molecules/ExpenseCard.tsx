@@ -6,6 +6,7 @@ import { Button, MultipleSelectInput } from '@components/atoms';
 import { trpc } from '@utils/trpc';
 
 import { AiFillCloseCircle } from 'react-icons/ai';
+import { z } from 'zod';
 
 interface Props {
   expense: Expense & { categories: Category[] };
@@ -14,6 +15,7 @@ interface Props {
 export const ExpenseCard: React.FC<Props> = ({ expense }) => {
   const deleteMutation = trpc.useMutation(['expense.deleteExpense']);
   const updateCategoriesMutation = trpc.useMutation(['expense.udpateCategories']);
+  const updateExpenseMutation = trpc.useMutation(['expense.updateExpense']);
   const trpcContext = trpc.useContext();
 
   const deleteExpense = useCallback(() => {
@@ -86,6 +88,25 @@ export const ExpenseCard: React.FC<Props> = ({ expense }) => {
     [expense.id, trpcContext, updateCategoriesMutation]
   );
 
+  const updateDate = useCallback(
+    (date: string) => {
+      const validDate = new Date(z.string().parse(date));
+
+      updateExpenseMutation.mutate(
+        {
+          id: expense.id,
+          createdAt: validDate,
+        },
+        {
+          onSuccess: () => {
+            trpcContext.invalidateQueries(['expense.allExpenses']);
+          },
+        }
+      );
+    },
+    [updateExpenseMutation, expense.id, trpcContext]
+  );
+
   return (
     <li className="flex flex-col border p-3 gap-3 rounded">
       <div className="grid grid-cols-4">
@@ -101,6 +122,17 @@ export const ExpenseCard: React.FC<Props> = ({ expense }) => {
             <AiFillCloseCircle />
           </Button>
         </div>
+      </div>
+
+      <div className="flex">
+        <input
+          type="date"
+          value={expense.date.toISOString().split('T')[0]}
+          className="rounded border-1 border-gray-700 bg-gray-600 p-1"
+          onChange={(e) => {
+            updateDate(e.target.value);
+          }}
+        />
       </div>
 
       <MultipleSelectInput

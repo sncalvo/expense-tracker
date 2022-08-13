@@ -24,7 +24,7 @@ export const expensesRouter = createProtectedRouter()
         throw new TRPCError({ code: 'FORBIDDEN' });
       }
 
-      const { name, amount, description, categories } = input;
+      const { name, amount, description, categories, createdAt } = input;
 
       return await ctx.prisma.expense.create({
         data: {
@@ -32,12 +32,52 @@ export const expensesRouter = createProtectedRouter()
           name,
           amount,
           description,
+          createdAt,
           categories: {
             connectOrCreate: categories.map(({ id, name }) => ({
               where: { id },
               create: { name },
             })),
           },
+        },
+      });
+    },
+  })
+  .mutation('updateExpense', {
+    input: z.object({
+      id: z.string(),
+      name: z.string().optional(),
+      amount: z.number().positive().optional(),
+      description: z.string().optional(),
+      createdAt: z.date().optional(),
+    }),
+    async resolve({ ctx, input }) {
+      if (!ctx.session.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN' });
+      }
+
+      const { id, name, amount, description, createdAt } = input;
+
+      // const expense = await ctx.prisma.expense.findFirst({
+      //   where: {
+      //     id: input.id,
+      //     userId: ctx.session.user.id,
+      //   },
+      // });
+
+      // if (!expense) {
+      //   throw new TRPCError({ code: 'NOT_FOUND' });
+      // }
+
+      console.log(createdAt);
+
+      return await ctx.prisma.expense.update({
+        where: { id },
+        data: {
+          // name,
+          // amount,
+          // description,
+          createdAt,
         },
       });
     },

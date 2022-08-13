@@ -11,6 +11,7 @@ export const Expense = z.object({
   name: z.string(),
   amount: z.preprocess((amount) => parseInt(amount as string, 10), z.number().positive()),
   description: z.string(),
+  createdAt: z.string().optional(),
   categories: Categories,
 });
 
